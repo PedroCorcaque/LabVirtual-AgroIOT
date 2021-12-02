@@ -8,6 +8,9 @@ HEADER = 'ID_TRANSMITTER/TEMPERATURE/HUMIDITY/ELETRIC/TIMESTAMP'
 class Payload(object):
     def __init__(self, j):
         self.__dict__ = json.loads(j)
+    
+    def returnJson(j):
+        return json.dumps(j)
 
 def get_real_time() -> list:
     time_now = datetime.now()
@@ -23,8 +26,13 @@ def check_if_file_exists(filepath: str) -> bool:
     except FileNotFoundError:
         return False
 
+# pay = Payload
 def add_line_on_file(data: bytes):
+    # print('data: {}'.format(type(data)))
     payload = Payload(data)
+    # print('payload: {}'.format(type(payload)))
+    # carregar_json = pay.returnJson(data)
+    # print(type(carregar_json))
     transmitter = str(payload.Transmissor)
     temperature = str(payload.Temperatura)
     humidity = str(payload.Umidade)
@@ -47,6 +55,3 @@ def add_line_on_file(data: bytes):
             writer = csv.writer(csv_file)
             writer.writerow(data_header)
             writer.writerow(data)
-
-if __name__ == '__main__':
-    add_line_on_file(b'{"Transmissor":"1210","Temperatura":32,"Umidade":28,"Condutividade":12}')
