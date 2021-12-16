@@ -6,7 +6,7 @@ from data_entry import add_line_on_file
 
 def on_connect(client, userData, flags, resultCode):
     print('Connected with result code ' + str(resultCode))
-    client.subscribe('<@|$>agro-iot<@|$>')
+    client.subscribe('BCICounter')
 
 def on_message(client, userData, message):
     topic = message.topic
@@ -20,6 +20,6 @@ client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 
-client.connect('mqtt.eclipseprojects.io', 1883, 60)
+client.connect('mqtt.eclipseprojects.io', 1883)
 
 client.loop_forever()

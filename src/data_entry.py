@@ -3,7 +3,7 @@ import json
 from datetime import date, datetime
 
 PATH_TO_CSV_FILE = '.\data\sensors_data.csv'
-HEADER = 'ID_TRANSMITTER/TEMPERATURE/HUMIDITY/ELETRIC/TIMESTAMP'
+HEADER = 'ID_TRANSMITTER/HUMIDITY/TIMESTAMP'
 
 class Payload(object):
     def __init__(self, j):
@@ -28,17 +28,11 @@ def check_if_file_exists(filepath: str) -> bool:
 
 # pay = Payload
 def add_line_on_file(data: bytes):
-    # print('data: {}'.format(type(data)))
     payload = Payload(data)
-    # print('payload: {}'.format(type(payload)))
-    # carregar_json = pay.returnJson(data)
-    # print(type(carregar_json))
     transmitter = str(payload.Transmissor)
-    temperature = str(payload.Temperatura)
     humidity = str(payload.Umidade)
-    eletric = str(payload.Condutividade)
 
-    data = transmitter + '/' + temperature + '/' + humidity + '/' + eletric
+    data = transmitter + '/' + humidity
 
     if '#' in data:
         data = data.replace('#','NA')
