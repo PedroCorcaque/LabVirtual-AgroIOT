@@ -322,7 +322,7 @@ def main():
     while True:
         try:
             data_read = readSerialPort(porta_serial, baudrate, delay=100)
-            filename = "./data/" + data_read[0].replace("/","-") + ".csv"
+            filename = "../data/" + data_read[0].replace("/","-") + ".csv"
             try:
                 addLineOnFile(filename, data_read)
             except Exception as e:
