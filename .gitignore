@@ -1,1 +1,2 @@
-./data/
+# ignore data of the Data directory
+data/
