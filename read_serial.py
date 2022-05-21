@@ -162,10 +162,10 @@ def send_request(enviar):
             '$push': {
                 'hora': enviar['hora'],
                 'sensor.A.Umidade': enviar['umidadeA'],
-                'sensor.A.Conductividade': enviar['conductividadeA'],
+                'sensor.A.Condutividade': enviar['condutividadeA'],
                 'sensor.A.Temperatura': enviar['temperaturaA'],
                 'sensor.B.Umidade': enviar['umidadeB'],
-                'sensor.B.Conductividade': enviar['conductividadeB'],
+                'sensor.B.Condutividade': enviar['condutividadeB'],
                 'sensor.B.Temperatura': enviar['temperaturaB'],
             },
         },
@@ -204,7 +204,7 @@ def make_request(enviar):
         if status_code == 200 or status_code == 201:
             print('Leitura enviada com sucesso.')
             # print('-----------------------')
-            # print(f'Hora: {enviar["hora"]}\n---Sem palha---\nUmidade: {enviar["umidadeB"]}\nCond. Elet.: {enviar["conductividadeB"]}\nTemp.: {enviar["temperaturaB"]}\n---Com palha---\nUmidade: {enviar["umidadeA"]}\nCond. Elet.: {enviar["conductividadeA"]}\nTemp.: {enviar["temperaturaA"]}\n')
+            # print(f'Hora: {enviar["hora"]}\n---Sem palha---\nUmidade: {enviar["umidadeB"]}\nCond. Elet.: {enviar["condutividadeB"]}\nTemp.: {enviar["temperaturaB"]}\n---Com palha---\nUmidade: {enviar["umidadeA"]}\nCond. Elet.: {enviar["condutividadeA"]}\nTemp.: {enviar["temperaturaA"]}\n')
         else:
             fila_de_leituras.append(enviar)
             print(f'Status: {status_code}\nIniciando algoritmo de fila...')
@@ -223,10 +223,10 @@ def send_message(data_received):
             "data": data_to_send[0],
             "hora": data_to_send[1],
             "umidadeA": float(data_to_send[2]),
-            "conductividadeA": float(data_to_send[3]),
+            "condutividadeA": float(data_to_send[3]),
             "temperaturaA": float(data_to_send[4]),
             "umidadeB": float(data_to_send[5]),
-            "conductividadeB":float(data_to_send[6]),
+            "condutividadeB":float(data_to_send[6]),
             "temperaturaB": float(data_to_send[7])
         }
 
@@ -245,10 +245,10 @@ def send_message(data_received):
             "data": data_to_send[0],
             "hora": data_to_send[1],
             "umidadeA": float(data_to_send[2]),
-            "conductividadeA": float(data_to_send[3]),
+            "condutividadeA": float(data_to_send[3]),
             "temperaturaA": float(data_to_send[4]),
             "umidadeB": float(data_to_send[5]),
-            "conductividadeB":float(data_to_send[6]),
+            "condutividadeB":float(data_to_send[6]),
             "temperaturaB": float(data_to_send[7])
         }
 
@@ -267,10 +267,10 @@ def send_message(data_received):
 #         '$push': {
 # 			'hora': 'teste',
 # 			'sensor.A.Umidade': 'teste',
-# 			'sensor.A.Conductividade': 'teste',
+# 			'sensor.A.condutividade': 'teste',
 # 			'sensor.A.Temperatura': 'teste',
 # 			'sensor.B.Umidade': 'teste',
-# 			'sensor.B.Conductividade': 'teste',
+# 			'sensor.B.condutividade': 'teste',
 # 			'sensor.B.Temperatura': 'teste',
 # 		},
 #     },
@@ -308,10 +308,10 @@ def send_message(data_received):
     # '$push':{
     #     'hora': data[1],
     #     'sensor.A.Umidade': data[2],
-    #     'sensor.A.Conductividade': data[3],
+    #     'sensor.A.condutividade': data[3],
     #     'sensor.A.Temperatura': data[4],
     #     'sensor.B.Umidade': data[5],
-    #     'sensor.B.Conductividade': data[6],
+    #     'sensor.B.condutividade': data[6],
     #     'sensor.B.Temperatura': data[7]
     #     }}, upsert=True)
 
