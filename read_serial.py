@@ -1,12 +1,8 @@
-from ast import Pass
 import csv
 import time
-from datetime import datetime
 import serial
 from os import environ
-from pymongo import MongoClient
 import requests
-from bot import telegramSendMessage
 import json
 import os
 
@@ -22,70 +18,12 @@ fila_de_leituras = []
 CHAT_ID_SANTIAGO = '2052104922'
 CHAT_ID_CORCAQUE = '1151737012'
 
-def sendErrorMessage(chat_id_admin, message):
-
-    send_text = f"https://api.telegram.org/bot5282017036:AAGZyfFSstVfdyetexitox6zjftNg2bxr0U/sendMessage?chat_id={chat_id_admin}&parse_mode=Markdown&text={message}"
-
-    resp = requests.get(send_text)
-
-    return resp.json()
-
-def sendAlertBot(data: dict):
-    message = ''
-    HEADER = 'ALERTA\n\n'
-    for temp in [data["temperaturaA"], data["temperaturaB"]]:
-        if temp == None:
-            continue
-        else:
-            if float(temp) > MAX_TEMPERATURE:
-                if HEADER in message:
-                    message += f'Temperatura acima do valor estabelecido ({MAX_TEMPERATURE} ºC).\nTemperatura atual: {temp} ºC.\n\n'
-                else:
-                    message += HEADER
-                    message += f'Temperatura acima do valor estabelecido ({MAX_TEMPERATURE} ºC).\nTemperatura atual: {temp} ºC.\n\n'
-    for umid in [data["umidadeA"], data["umidadeB"]]:
-        if umid == None:
-            continue
-        else:
-            if float(umid) < MIN_HUMIDITY:
-                if HEADER in message:
-                    message += f'Umidade abaixo do valor estabelecido ({MIN_HUMIDITY}).\nUmidade atual: {umid}.\n\n'
-                else:
-                    message += HEADER
-                    message += f'Umidade abaixo do valor estabelecido ({MIN_HUMIDITY}).\nUmidade atual: {umid}.\n\n'
-    if message != '':
-        message += f'Hora da leitura: {data["hora"]}.\n'
-    return message
-
-def sendMessageBot(data):
-    message = ''
-    if len(data) == 7:
-        # sem um dos sensores
-        if data[2] == '':
-            # sem sensor 1
-            data = [data[0], data[1], None, None, None, data[7], data[8], data[9]]
-            message += f"Data da leitura: {data[0]}\nHora da leitura: {data[1]}\n***SEM PALHA***\nUmidade: {data[2]}\nCondutividade eletrica: {data[3]}\nTemperatura: {data[4]}"
-        elif data[6] == '':
-            # sem sensor 2
-            data = [data[0], data[1], data[3], data[4], data[5], None, None, None]
-            message += f"Data da leitura: {data[0]}\nHora da leitura: {data[1]}\n***SEM PALHA***\nUmidade: {data[2]}\nCondutividade eletrica: {data[3]}\nTemperatura: {data[4]}"
-
-    elif len(data) == 10:
-        data = [data[0], data[1], data[3], data[4], data[5], data[7], data[8], data[9]]
-        message += f"Data da leitura: {data[0]}\nHora da leitura: {data[1]}\n***COM PALHA***\nUmidade: {data[2]}\nCondutividade eletrica: {data[3]}\nTemperatura: {data[4]}\n***SEM PALHA***\nUmidade: {data[5]}\nCondutividade eletrica: {data[6]}\nTemperatura: {data[7]}"
-    else:
-        print("Erro ao receber leitura")
-        raise Exception("Erro ao receber leitura")
-
-    if message != '':
-        return telegramSendMessage(message)
-
 def checkIfFileExists(filepath: str) -> bool:
     try:
         open(filepath, 'r')
         return True
     except FileNotFoundError:
-        return False    
+        return False
 
 def addLineOnFile(filepath: str, data: str) -> bool:
     if len(data) == 7:
@@ -230,12 +168,6 @@ def send_message(data_received):
             "temperaturaB": float(data_to_send[7])
         }
 
-        try:
-            msg = sendAlertBot(enviar)
-            if msg != '':
-                telegramSendMessage(msg)
-        except Exception as e:
-            pass
         make_request(enviar)
 
     elif len(data_received) == 10:
@@ -252,77 +184,16 @@ def send_message(data_received):
             "temperaturaB": float(data_to_send[7])
         }
 
-#         import requests
-# import json
-# url = "https://data.mongodb-api.com/app/data-gvnvn/endpoint/data/beta/action/updateOne"
-
-# payload = json.dumps({
-#     "collection": "teste",
-#     "database": "DBLabvirtual",
-#     "dataSource": "LabvitualData",
-#     'filter':{
-#         '_id': 'testeID'
-#     },
-#     "update": {
-#         '$push': {
-# 			'hora': 'teste',
-# 			'sensor.A.Umidade': 'teste',
-# 			'sensor.A.condutividade': 'teste',
-# 			'sensor.A.Temperatura': 'teste',
-# 			'sensor.B.Umidade': 'teste',
-# 			'sensor.B.condutividade': 'teste',
-# 			'sensor.B.Temperatura': 'teste',
-# 		},
-#     },
-#     'upsert': True
-# })
-# headers = {
-#     'Content-Type': 'application/json',
-#     'Access-Control-Request-Headers': '*',
-#     'api-key': 'kG7FLPGRlWolLdfJEgxJQtibU4CGvaetuVqRmTgI3wGm4SeyCr8MLsah9ERUufNw'
-# }
-
-# response = requests.request("POST", url, headers=headers, data=payload)
-
-
-        try:
-            msg = sendAlertBot(enviar)
-            if msg != '':
-                telegramSendMessage(msg)
-        except Exception as e:
-            pass
-
-        print('Vai mandar em')
         make_request(enviar)
-        print('Mandou')
     else:
         print("Erro ao receber leitura")
-        # print(data_received)
         
         raise Exception("Erro ao receber leitura")
-
-
-    # db = MongoClient(environ['CORC_MONGO_USER'])['DBLabvirtual']['Dados_Sensores']
-
-    # db.update_one({'_id': data[0]}, {
-    # '$push':{
-    #     'hora': data[1],
-    #     'sensor.A.Umidade': data[2],
-    #     'sensor.A.condutividade': data[3],
-    #     'sensor.A.Temperatura': data[4],
-    #     'sensor.B.Umidade': data[5],
-    #     'sensor.B.condutividade': data[6],
-    #     'sensor.B.Temperatura': data[7]
-    #     }}, upsert=True)
-
-    # print(data_to_send)
     
 def main():
-    
     while True:
         try:
             data_read = readSerialPort(porta_serial, baudrate, delay=100)
-            print(data_read)
             filename = "../data/" + data_read[0].replace("/","-") + ".csv"
             try:
                 addLineOnFile(filename, data_read)
