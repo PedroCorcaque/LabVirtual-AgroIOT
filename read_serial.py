@@ -6,9 +6,6 @@ import requests
 import json
 import os
 
-MAX_TEMPERATURE = float(31.0)
-MIN_HUMIDITY = float(6.0)
-
 url = "https://data.mongodb-api.com/app/data-gvnvn/endpoint/data/beta/action/updateOne"
 porta_serial = "/dev/ttyUSB0" # Especificar porta serial a ser utilizada
 baudrate = 9600
@@ -59,7 +56,6 @@ def bin2str(data_entry: bytes) -> list:
     @return
     data in string format
     '''
-    count = 0
     data = data_entry.decode('utf-8')
     
     infos = data.split('+')
