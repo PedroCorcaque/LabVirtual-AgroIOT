@@ -1,4 +1,4 @@
-from ast import Pass
+#!/usr/bin/env python3
 import csv
 import time
 from datetime import datetime
