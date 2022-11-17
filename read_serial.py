@@ -6,7 +6,6 @@ import serial
 from os import environ
 from pymongo import MongoClient
 import requests
-from bot import telegramSendMessage
 import json
 import os
 
@@ -19,66 +18,6 @@ baudrate = 9600
 timeout = 10
 HEADER = ["data", "hora", "umidade_a", "condutividade_a", "temperatura_a", "umidade_b", "condutividade_b", "temperatura_b"]
 fila_de_leituras = []
-CHAT_ID_SANTIAGO = '2052104922'
-CHAT_ID_CORCAQUE = '1151737012'
-
-def sendErrorMessage(chat_id_admin, message):
-
-    send_text = f"https://api.telegram.org/bot5282017036:AAGZyfFSstVfdyetexitox6zjftNg2bxr0U/sendMessage?chat_id={chat_id_admin}&parse_mode=Markdown&text={message}"
-
-    resp = requests.get(send_text)
-
-    return resp.json()
-
-def sendAlertBot(data: dict):
-    message = ''
-    HEADER = 'ALERTA\n\n'
-    for temp in [data["temperaturaA"], data["temperaturaB"]]:
-        if temp == None:
-            continue
-        else:
-            if float(temp) > MAX_TEMPERATURE:
-                if HEADER in message:
-                    message += f'Temperatura acima do valor estabelecido ({MAX_TEMPERATURE} ºC).\nTemperatura atual: {temp} ºC.\n\n'
-                else:
-                    message += HEADER
-                    message += f'Temperatura acima do valor estabelecido ({MAX_TEMPERATURE} ºC).\nTemperatura atual: {temp} ºC.\n\n'
-    for umid in [data["umidadeA"], data["umidadeB"]]:
-        if umid == None:
-            continue
-        else:
-            if float(umid) < MIN_HUMIDITY:
-                if HEADER in message:
-                    message += f'Umidade abaixo do valor estabelecido ({MIN_HUMIDITY}).\nUmidade atual: {umid}.\n\n'
-                else:
-                    message += HEADER
-                    message += f'Umidade abaixo do valor estabelecido ({MIN_HUMIDITY}).\nUmidade atual: {umid}.\n\n'
-    if message != '':
-        message += f'Hora da leitura: {data["hora"]}.\n'
-    return message
-
-def sendMessageBot(data):
-    message = ''
-    if len(data) == 7:
-        # sem um dos sensores
-        if data[2] == '':
-            # sem sensor 1
-            data = [data[0], data[1], None, None, None, data[7], data[8], data[9]]
-            message += f"Data da leitura: {data[0]}\nHora da leitura: {data[1]}\n***SEM PALHA***\nUmidade: {data[2]}\nCondutividade eletrica: {data[3]}\nTemperatura: {data[4]}"
-        elif data[6] == '':
-            # sem sensor 2
-            data = [data[0], data[1], data[3], data[4], data[5], None, None, None]
-            message += f"Data da leitura: {data[0]}\nHora da leitura: {data[1]}\n***SEM PALHA***\nUmidade: {data[2]}\nCondutividade eletrica: {data[3]}\nTemperatura: {data[4]}"
-
-    elif len(data) == 10:
-        data = [data[0], data[1], data[3], data[4], data[5], data[7], data[8], data[9]]
-        message += f"Data da leitura: {data[0]}\nHora da leitura: {data[1]}\n***COM PALHA***\nUmidade: {data[2]}\nCondutividade eletrica: {data[3]}\nTemperatura: {data[4]}\n***SEM PALHA***\nUmidade: {data[5]}\nCondutividade eletrica: {data[6]}\nTemperatura: {data[7]}"
-    else:
-        print("Erro ao receber leitura")
-        raise Exception("Erro ao receber leitura")
-
-    if message != '':
-        return telegramSendMessage(message)
 
 def checkIfFileExists(filepath: str) -> bool:
     try:
@@ -230,12 +169,6 @@ def send_message(data_received):
             "temperaturaB": float(data_to_send[7])
         }
 
-        try:
-            msg = sendAlertBot(enviar)
-            if msg != '':
-                telegramSendMessage(msg)
-        except Exception as e:
-            pass
         make_request(enviar)
 
     elif len(data_received) == 10:
@@ -284,13 +217,6 @@ def send_message(data_received):
 
 # response = requests.request("POST", url, headers=headers, data=payload)
 
-
-        try:
-            msg = sendAlertBot(enviar)
-            if msg != '':
-                telegramSendMessage(msg)
-        except Exception as e:
-            pass
 
         print('Vai mandar em')
         make_request(enviar)
